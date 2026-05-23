@@ -20,16 +20,16 @@ export function TypingPractice() {
 	const [typedText, setTypedText] = useState("");
 	const [startTime, setStartTime] = useState<number | null>(null);
 	const [endTime, setEndTime] = useState<number | null>(null);
-	const [now, setNow] = useState(() => Date.now());
+	const [now, setNow] = useState(() => performance.now());
 	const [isFocused, setIsFocused] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const isComplete = typedText.length >= STORY.length;
 
-	// Tick every second while typing
+	// Tick every second while the test is running
 	useEffect(() => {
 		if (!startTime || endTime) return;
-		const interval = setInterval(() => setNow(Date.now()), 1000);
+		const interval = setInterval(() => setNow(performance.now()), 1000);
 		return () => clearInterval(interval);
 	}, [startTime, endTime]);
 
@@ -39,7 +39,7 @@ export function TypingPractice() {
 			const value = e.target.value.slice(0, STORY.length);
 
 			if (!startTime) {
-				const ts = Date.now();
+				const ts = performance.now();
 				setStartTime(ts);
 				setNow(ts);
 			}
@@ -47,7 +47,7 @@ export function TypingPractice() {
 			setTypedText(value);
 
 			if (value.length >= STORY.length) {
-				const ts = Date.now();
+				const ts = performance.now();
 				setEndTime(ts);
 				setNow(ts);
 			}
@@ -59,7 +59,7 @@ export function TypingPractice() {
 		setTypedText("");
 		setStartTime(null);
 		setEndTime(null);
-		setNow(Date.now());
+		setNow(performance.now());
 		setTimeout(() => textareaRef.current?.focus(), 0);
 	}, []);
 
@@ -118,7 +118,7 @@ export function TypingPractice() {
 					</button>
 				</div>
 
-				{/* Typing stage — label semantically focuses the hidden textarea on click */}
+				{/* Typing stage */}
 				<label
 					htmlFor="typing-input"
 					className={[
@@ -132,7 +132,11 @@ export function TypingPractice() {
 						.filter(Boolean)
 						.join(" ")}
 				>
-					{/* Hidden textarea captures all keystrokes */}
+					{/*
+					 * Transparent full-area textarea — covers the entire stage so any
+					 * click lands directly on the input and triggers native focus.
+					 * Overlays sit on top via z-10; textarea stays behind at default z.
+					 */}
 					<textarea
 						id="typing-input"
 						ref={textareaRef}
@@ -140,7 +144,7 @@ export function TypingPractice() {
 						onChange={handleInput}
 						onFocus={() => setIsFocused(true)}
 						onBlur={() => setIsFocused(false)}
-						className="absolute h-0 w-0 opacity-0"
+						className="absolute inset-0 cursor-text resize-none rounded-2xl bg-transparent opacity-0"
 						autoComplete="off"
 						autoCorrect="off"
 						autoCapitalize="off"
@@ -149,7 +153,7 @@ export function TypingPractice() {
 					/>
 
 					{/* Story text rendered character by character */}
-					<p className="select-none font-mono text-xl leading-relaxed">
+					<p className="relative select-none font-mono text-xl leading-relaxed">
 						{STORY.split("").map((char, i) => {
 							const isTyped = i < typedText.length;
 							const isCorrect = typedText[i] === char;
@@ -175,18 +179,19 @@ export function TypingPractice() {
 						})}
 					</p>
 
-					{/* Click-to-start overlay */}
+					{/* Click-to-start overlay — z-10 sits above the transparent textarea.
+				    Clicks bubble to the <label>, which natively focuses #typing-input. */}
 					{!isFocused && !startTime && (
-						<div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm">
+						<div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm">
 							<p className="text-sm font-medium text-gray-500">
 								Click here to start typing
 							</p>
 						</div>
 					)}
 
-					{/* Completion overlay */}
+					{/* Completion overlay — z-10 sits above the transparent textarea */}
 					{isComplete && (
-						<div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
+						<div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
 							<p className="mb-1 text-5xl font-bold text-gray-900">{wpm}</p>
 							<p className="mb-1 text-lg text-gray-500">words per minute</p>
 							<p className="mb-6 text-sm text-gray-400">
@@ -203,6 +208,8 @@ export function TypingPractice() {
 						</div>
 					)}
 				</label>
+
+				{/* Progress bar */}
 				<div className="mt-4 h-1 overflow-hidden rounded-full bg-gray-200">
 					<div
 						className={[
