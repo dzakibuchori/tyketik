@@ -27,10 +27,21 @@
 			"recommended": true
 		}
 	},
+	"overrides": [
+		{
+			"includes": ["src/components/TypingPractice.tsx"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noArrayIndexKey": "off"
+					}
+				}
+			}
+		}
+	],
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"
 		}
 	}
 }
-

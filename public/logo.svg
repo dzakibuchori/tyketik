@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="70.698807mm"
+   height="15.316mm"
+   viewBox="0 0 70.698807 15.316"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-116.12233,-15.658552)">
+    <g
+       id="g5-7"
+       transform="matrix(0.1515698,0,0,0.1515698,108.9011,6.2243612)">
+      <rect
+         style="fill:#333333;stroke-width:0.264583"
+         id="rect1-9"
+         width="101.04916"
+         height="101.04916"
+         x="47.642948"
+         y="62.24321"
+         ry="20" />
+      <path
+         id="rect1-5-3"
+         style="fill:#e6e6e6;stroke-width:0.264583"
+         d="m 128.42214,74.941162 c -20.80801,0.01937 -41.617299,-0.06804 -62.424101,0.207223 -3.461701,0.718484 -5.919774,4.264821 -5.654435,7.746297 0.06973,4.970198 -0.0017,9.943464 0.02067,14.914852 -0.0011,15.656116 -0.102773,31.317216 0.233578,46.969226 0.485218,3.52253 4.100032,6.03839 7.556644,5.79551 18.461633,-0.0144 36.924314,0.0784 55.385254,-0.10645 2.48025,-0.0604 4.98156,-0.0118 7.44502,-0.2682 3.33105,-1.0217 5.44896,-4.6849 4.99556,-8.08685 -0.0373,-20.27537 0.13674,-40.55338 -0.22169,-60.826259 -0.002,-2.467502 -1.85607,-4.567414 -3.96462,-5.631181 -1.04079,-0.516064 -2.20987,-0.775217 -3.37188,-0.714168 z m -0.21291,5.293217 c 0.84493,-0.06497 1.83576,0.2746 2.19676,1.103292 0.42512,20.135779 0.20718,40.277099 0.32195,60.415429 0.0997,1.15935 0.0622,2.75561 -1.21233,3.2644 -20.14602,0.37695 -40.296132,0.22464 -60.444374,0.26924 -1.139082,0.14414 -2.710959,0.0426 -3.165181,-1.22628 -0.38101,-19.96127 -0.195187,-39.927 -0.267167,-59.890404 C 65.43534,82.85078 65.543335,81.12108 66.884806,80.4354 87.325451,80.220178 107.76774,80.247359 128.20923,80.234379 Z" />
+      <path
+         id="rect4-1"
+         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#e6e6e6;fill-opacity:1;stroke-width:0.420674;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none"
+         d="m 98.167685,88.484909 c -5.625292,0 -10.55733,4.304134 -13.43727,10.852643 1.341628,-1.302341 3.041325,-2.246041 4.865945,-2.657828 4.337104,-0.92828 8.871354,0.34273 12.62745,2.546568 5.70785,3.396698 10.36133,8.876128 12.00501,15.387748 0.0302,-0.61001 0.0504,-1.2242 0.0504,-1.84625 0,-13.452662 -7.18556,-24.282881 -16.111495,-24.282881 z M 82.10538,110.94731 c -0.02935,0.6016 -0.04977,1.2072 -0.04977,1.82048 0,13.45267 7.186141,24.28289 16.112077,24.28289 5.624133,0 10.555323,-4.30232 13.435513,-10.84854 -0.68832,0.68059 -1.47352,1.2633 -2.33636,1.71333 -3.45937,1.75584 -7.60635,1.49116 -11.183472,0.23714 -5.921577,-2.16058 -10.960013,-6.59046 -13.978322,-12.11333 -0.867329,-1.58664 -1.571063,-3.31168 -1.999664,-5.09197 z" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.873px;font-family:Calibri;-inkscape-font-specification:'Calibri, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;vector-effect:none;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke-width:0.464918;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none"
+       x="134.30176"
+       y="27.80662"
+       id="text6-9"><tspan
+         id="tspan6-8"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.873px;font-family:Calibri;-inkscape-font-specification:'Calibri, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill-rule:nonzero;stroke-width:0.464918"
+         x="134.30176"
+         y="27.80662">Tyketik</tspan></text>
+  </g>
+</svg>
