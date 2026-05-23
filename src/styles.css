@@ -15,7 +15,7 @@ body {
   margin: 0;
 }
 
-/* Typing cursor blink animation */
+/* Typing cursor — animates border-color only, never touches the character */
 @keyframes tyke-blink {
   0%, 100% { border-color: #1f2937; }
   50% { border-color: transparent; }
@@ -23,6 +23,6 @@ body {
 
 .tyke-cursor {
   border-left: 2px solid #1f2937;
-  animation: tyke-blink 1.1s step-start infinite;
+  animation: tyke-blink 1.1s step-end infinite;
 }
 
