@@ -23,6 +23,12 @@ export function TypingPractice() {
 	const [now, setNow] = useState(() => performance.now());
 	const [isFocused, setIsFocused] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	// Keystroke counters — mutable refs so they never cause stale-closure issues
+	// in handleInput. Accuracy is derived from these on every render.
+	const keystrokesRef = useRef({ correct: 0, incorrect: 0 });
+	// Tracks the last committed typedText so handleInput can diff the delta
+	// without needing typedText in its dependency array.
+	const prevTypedRef = useRef("");
 
 	const isComplete = typedText.length >= STORY.length;
 
@@ -37,6 +43,7 @@ export function TypingPractice() {
 		(e: ChangeEvent<HTMLTextAreaElement>) => {
 			if (isComplete) return;
 			const value = e.target.value.slice(0, STORY.length);
+			const prev = prevTypedRef.current;
 
 			if (!startTime) {
 				const ts = performance.now();
@@ -44,6 +51,20 @@ export function TypingPractice() {
 				setNow(ts);
 			}
 
+			// Only count added characters — backspaces are invisible to accuracy,
+			// exactly as MonkeyType does it.
+			if (value.length > prev.length) {
+				const added = value.slice(prev.length);
+				for (let j = 0; j < added.length; j++) {
+					if (added[j] === STORY[prev.length + j]) {
+						keystrokesRef.current.correct++;
+					} else {
+						keystrokesRef.current.incorrect++;
+					}
+				}
+			}
+
+			prevTypedRef.current = value;
 			setTypedText(value);
 
 			if (value.length >= STORY.length) {
@@ -60,6 +81,8 @@ export function TypingPractice() {
 		setStartTime(null);
 		setEndTime(null);
 		setNow(performance.now());
+		keystrokesRef.current = { correct: 0, incorrect: 0 };
+		prevTypedRef.current = "";
 		setTimeout(() => textareaRef.current?.focus(), 0);
 	}, []);
 
@@ -73,6 +96,11 @@ export function TypingPractice() {
 			? Math.round(correctChars / 5 / elapsedMins)
 			: 0;
 	const progress = (typedText.length / STORY.length) * 100;
+	// Accuracy — identical formula to MonkeyType: correct / (correct + incorrect)
+	const { correct: correctKs, incorrect: incorrectKs } = keystrokesRef.current;
+	const totalKs = correctKs + incorrectKs;
+	const accuracy =
+		totalKs > 0 ? Math.round((correctKs / totalKs) * 1000) / 10 : 100;
 
 	return (
 		<section className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gray-50 px-4 py-16">
@@ -96,6 +124,14 @@ export function TypingPractice() {
 							</div>
 							<div className="text-xs uppercase tracking-wider text-gray-400">
 								WPM
+							</div>
+						</div>
+						<div className="text-center">
+							<div className="text-2xl font-bold tabular-nums text-gray-800">
+								{accuracy.toFixed(1)}%
+							</div>
+							<div className="text-xs uppercase tracking-wider text-gray-400">
+								Acc
 							</div>
 						</div>
 						<div className="text-center">
@@ -193,10 +229,25 @@ export function TypingPractice() {
 					{isComplete && (
 						<div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
 							<p className="mb-1 text-5xl font-bold text-gray-900">{wpm}</p>
-							<p className="mb-1 text-lg text-gray-500">words per minute</p>
-							<p className="mb-6 text-sm text-gray-400">
-								Finished in {formatTime(elapsedSecs)}
-							</p>
+							<p className="mb-3 text-lg text-gray-500">words per minute</p>
+							<div className="mb-6 flex gap-6 text-center">
+								<div>
+									<p className="text-2xl font-semibold text-gray-800">
+										{accuracy.toFixed(1)}%
+									</p>
+									<p className="text-xs uppercase tracking-wider text-gray-400">
+										Accuracy
+									</p>
+								</div>
+								<div>
+									<p className="text-2xl font-semibold text-gray-800">
+										{formatTime(elapsedSecs)}
+									</p>
+									<p className="text-xs uppercase tracking-wider text-gray-400">
+										Time
+									</p>
+								</div>
+							</div>
 							<button
 								type="button"
 								onClick={restart}
