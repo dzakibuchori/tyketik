@@ -7,6 +7,8 @@ import {
 	useState,
 } from "react";
 
+const DURATION_SECS = 60;
+
 function formatTime(secs: number): string {
 	const m = Math.floor(secs / 60);
 	const s = secs % 60;
@@ -37,12 +39,24 @@ export function TypingPractice({
 	// without needing typedText in its dependency array.
 	const prevTypedRef = useRef("");
 
-	const isComplete = typedText.length >= story.length;
+	// Derived time values — computed early so isComplete can use them
+	const elapsedMs = startTime ? (endTime ?? now) - startTime : 0;
+	const elapsedSecs = Math.floor(elapsedMs / 1000);
+	const remainingSecs = Math.max(0, DURATION_SECS - elapsedSecs);
+	const timeExpired = startTime !== null && elapsedSecs >= DURATION_SECS;
+	const finishedPassage = typedText.length >= story.length;
+	const isComplete = finishedPassage || timeExpired;
 
-	// Tick every second while the test is running
+	// Tick every second while the test is running; auto-end after DURATION_SECS
 	useEffect(() => {
 		if (!startTime || endTime) return;
-		const interval = setInterval(() => setNow(performance.now()), 1000);
+		const interval = setInterval(() => {
+			const currentNow = performance.now();
+			setNow(currentNow);
+			if (currentNow - startTime >= DURATION_SECS * 1000) {
+				setEndTime(currentNow);
+			}
+		}, 1000);
 		return () => clearInterval(interval);
 	}, [startTime, endTime]);
 
@@ -94,15 +108,14 @@ export function TypingPractice({
 	}, []);
 
 	// Derived stats
-	const elapsedMs = startTime ? (endTime ?? now) - startTime : 0;
-	const elapsedSecs = Math.floor(elapsedMs / 1000);
 	const elapsedMins = elapsedMs / 60000;
 	const correctChars = [...typedText].filter((ch, i) => ch === story[i]).length;
 	const wpm =
 		startTime && elapsedMins > 0.008
 			? Math.round(correctChars / 5 / elapsedMins)
 			: 0;
-	const progress = (typedText.length / story.length) * 100;
+	// Time progress: fills left-to-right as the 60 s window elapses
+	const timeProgress = startTime ? (elapsedSecs / DURATION_SECS) * 100 : 0;
 	// Accuracy — identical formula to MonkeyType: correct / (correct + incorrect)
 	const { correct: correctKs, incorrect: incorrectKs } = keystrokesRef.current;
 	const totalKs = correctKs + incorrectKs;
@@ -118,7 +131,7 @@ export function TypingPractice({
 						Take It for a Spin
 					</h1>
 					<p className="text-gray-500">
-						Type the story below — the clock starts when you do.
+						Type the story below — you have 1 minute from your first keystroke.
 					</p>
 				</div>
 
@@ -152,11 +165,18 @@ export function TypingPractice({
 							</div>
 						</div>
 						<div className="text-center">
-							<div className="text-2xl font-bold tabular-nums text-gray-800">
-								{formatTime(elapsedSecs)}
+							<div
+								className={[
+									"text-2xl font-bold tabular-nums",
+									remainingSecs <= 10 && startTime && !isComplete
+										? "text-red-500"
+										: "text-gray-800",
+								].join(" ")}
+							>
+								{formatTime(remainingSecs)}
 							</div>
 							<div className="text-xs uppercase tracking-wider text-gray-400">
-								Time
+								Left
 							</div>
 						</div>
 					</div>
@@ -256,7 +276,11 @@ export function TypingPractice({
 					{isComplete && (
 						<div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
 							<p className="mb-1 text-5xl font-bold text-gray-900">{wpm}</p>
-							<p className="mb-3 text-lg text-gray-500">words per minute</p>
+							<p className="mb-3 text-lg text-gray-500">
+								{timeExpired && !finishedPassage
+									? "time's up!"
+									: "words per minute"}
+							</p>
 							<div className="mb-6 flex gap-6 text-center">
 								<div>
 									<p className="text-2xl font-semibold text-gray-800">
@@ -297,14 +321,14 @@ export function TypingPractice({
 					)}
 				</label>
 
-				{/* Progress bar */}
+				{/* Progress bar — tracks time elapsed against the 1-minute window */}
 				<div className="mt-4 h-1 overflow-hidden rounded-full bg-gray-200">
 					<div
 						className={[
 							"h-full rounded-full transition-all duration-150",
 							isComplete ? "bg-green-500" : "bg-gray-800",
 						].join(" ")}
-						style={{ width: `${progress}%` }}
+						style={{ width: `${isComplete ? 100 : timeProgress}%` }}
 					/>
 				</div>
 			</div>
