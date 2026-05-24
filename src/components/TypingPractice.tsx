@@ -46,6 +46,7 @@ export function TypingPractice({
 	const timeExpired = startTime !== null && elapsedSecs >= DURATION_SECS;
 	const finishedPassage = typedText.length >= story.length;
 	const isComplete = finishedPassage || timeExpired;
+	const isLowTime = remainingSecs <= 10 && startTime !== null && !isComplete;
 
 	// Tick every second while the test is running; auto-end after DURATION_SECS
 	useEffect(() => {
@@ -168,7 +169,7 @@ export function TypingPractice({
 							<div
 								className={[
 									"text-2xl font-bold tabular-nums",
-									remainingSecs <= 10 && startTime && !isComplete
+								remainingSecs <= 10 && startTime && !isComplete
 										? "text-red-500"
 										: "text-gray-800",
 								].join(" ")}
@@ -227,6 +228,8 @@ export function TypingPractice({
 						onChange={handleInput}
 						onFocus={() => setIsFocused(true)}
 						onBlur={() => setIsFocused(false)}
+						// biome-ignore lint/a11y/noAutofocus: intentional — typing test starts immediately on mount
+						autoFocus
 						className="absolute inset-0 cursor-text resize-none rounded-2xl bg-transparent opacity-0"
 						autoComplete="off"
 						autoCorrect="off"
@@ -275,12 +278,13 @@ export function TypingPractice({
 					{/* Completion overlay — z-10 sits above the transparent textarea */}
 					{isComplete && (
 						<div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
-							<p className="mb-1 text-5xl font-bold text-gray-900">{wpm}</p>
-							<p className="mb-3 text-lg text-gray-500">
-								{timeExpired && !finishedPassage
-									? "time's up!"
-									: "words per minute"}
-							</p>
+							<div className="mb-3 flex items-baseline gap-2">
+								<span className="text-5xl font-bold text-gray-900">{wpm}</span>
+								<span className="text-xl font-medium text-gray-400">WPM</span>
+							</div>
+							{timeExpired && !finishedPassage && (
+								<p className="mb-3 text-lg text-gray-500">time's up!</p>
+							)}
 							<div className="mb-6 flex gap-6 text-center">
 								<div>
 									<p className="text-2xl font-semibold text-gray-800">
@@ -326,7 +330,7 @@ export function TypingPractice({
 					<div
 						className={[
 							"h-full rounded-full transition-all duration-150",
-							isComplete ? "bg-green-500" : "bg-gray-800",
+							isComplete ? "bg-green-500" : isLowTime ? "bg-red-500" : "bg-gray-800",
 						].join(" ")}
 						style={{ width: `${isComplete ? 100 : timeProgress}%` }}
 					/>
