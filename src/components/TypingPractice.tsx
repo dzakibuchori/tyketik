@@ -1,4 +1,4 @@
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Wand2 } from "lucide-react";
 import {
 	type ChangeEvent,
 	useCallback,
@@ -7,16 +7,23 @@ import {
 	useState,
 } from "react";
 
-const STORY =
-	"A cat named Biscuit decided to become the world's greatest DJ. He spent three weeks learning to scratch records with his paws, only to discover he was shredding vinyl. His owner started selling the shredded pieces as abstract art on eBay for forty dollars each. Biscuit, furious about not getting royalties, launched his revenge: sitting directly on the keyboard whenever his owner worked. The laptop began autocorrecting everything to meow. The owner accidentally published a book titled Meow: A Business Strategy. It sold twelve thousand copies. Biscuit got nothing. He remains bitter to this day.";
-
 function formatTime(secs: number): string {
 	const m = Math.floor(secs / 60);
 	const s = secs % 60;
 	return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export function TypingPractice() {
+interface TypingPracticeProps {
+	story: string;
+	prompt: string;
+	onNewPrompt: () => void;
+}
+
+export function TypingPractice({
+	story,
+	prompt,
+	onNewPrompt,
+}: TypingPracticeProps) {
 	const [typedText, setTypedText] = useState("");
 	const [startTime, setStartTime] = useState<number | null>(null);
 	const [endTime, setEndTime] = useState<number | null>(null);
@@ -30,7 +37,7 @@ export function TypingPractice() {
 	// without needing typedText in its dependency array.
 	const prevTypedRef = useRef("");
 
-	const isComplete = typedText.length >= STORY.length;
+	const isComplete = typedText.length >= story.length;
 
 	// Tick every second while the test is running
 	useEffect(() => {
@@ -42,7 +49,7 @@ export function TypingPractice() {
 	const handleInput = useCallback(
 		(e: ChangeEvent<HTMLTextAreaElement>) => {
 			if (isComplete) return;
-			const value = e.target.value.slice(0, STORY.length);
+			const value = e.target.value.slice(0, story.length);
 			const prev = prevTypedRef.current;
 
 			if (!startTime) {
@@ -56,7 +63,7 @@ export function TypingPractice() {
 			if (value.length > prev.length) {
 				const added = value.slice(prev.length);
 				for (let j = 0; j < added.length; j++) {
-					if (added[j] === STORY[prev.length + j]) {
+					if (added[j] === story[prev.length + j]) {
 						keystrokesRef.current.correct++;
 					} else {
 						keystrokesRef.current.incorrect++;
@@ -67,13 +74,13 @@ export function TypingPractice() {
 			prevTypedRef.current = value;
 			setTypedText(value);
 
-			if (value.length >= STORY.length) {
+			if (value.length >= story.length) {
 				const ts = performance.now();
 				setEndTime(ts);
 				setNow(ts);
 			}
 		},
-		[startTime, isComplete],
+		[startTime, isComplete, story],
 	);
 
 	const restart = useCallback(() => {
@@ -90,12 +97,12 @@ export function TypingPractice() {
 	const elapsedMs = startTime ? (endTime ?? now) - startTime : 0;
 	const elapsedSecs = Math.floor(elapsedMs / 1000);
 	const elapsedMins = elapsedMs / 60000;
-	const correctChars = [...typedText].filter((ch, i) => ch === STORY[i]).length;
+	const correctChars = [...typedText].filter((ch, i) => ch === story[i]).length;
 	const wpm =
 		startTime && elapsedMins > 0.008
 			? Math.round(correctChars / 5 / elapsedMins)
 			: 0;
-	const progress = (typedText.length / STORY.length) * 100;
+	const progress = (typedText.length / story.length) * 100;
 	// Accuracy — identical formula to MonkeyType: correct / (correct + incorrect)
 	const { correct: correctKs, incorrect: incorrectKs } = keystrokesRef.current;
 	const totalKs = correctKs + incorrectKs;
@@ -113,6 +120,16 @@ export function TypingPractice() {
 					<p className="text-gray-500">
 						Type the story below — the clock starts when you do.
 					</p>
+				</div>
+
+				{/* Prompt badge */}
+				<div className="mb-5 flex justify-center">
+					<span className="inline-flex max-w-md items-center gap-1.5 truncate rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-500">
+						<Wand2 size={11} className="shrink-0 text-gray-400" />
+						<span className="truncate">
+							Topic: <span className="font-medium text-gray-700">{prompt}</span>
+						</span>
+					</span>
 				</div>
 
 				{/* Stats bar */}
@@ -144,14 +161,24 @@ export function TypingPractice() {
 						</div>
 					</div>
 
-					<button
-						type="button"
-						onClick={restart}
-						className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-800"
-					>
-						<RotateCcw size={14} />
-						Restart
-					</button>
+					<div className="flex items-center gap-1">
+						<button
+							type="button"
+							onClick={onNewPrompt}
+							className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-800"
+						>
+							<Wand2 size={14} />
+							New prompt
+						</button>
+						<button
+							type="button"
+							onClick={restart}
+							className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-800"
+						>
+							<RotateCcw size={14} />
+							Restart
+						</button>
+					</div>
 				</div>
 
 				{/* Typing stage */}
@@ -190,7 +217,7 @@ export function TypingPractice() {
 
 					{/* Story text rendered character by character */}
 					<p className="relative select-none font-mono text-xl leading-relaxed">
-						{STORY.split("").map((char, i) => {
+						{story.split("").map((char, i) => {
 							const isTyped = i < typedText.length;
 							const isCorrect = typedText[i] === char;
 							const isCursor = i === typedText.length && !isComplete;
@@ -248,14 +275,24 @@ export function TypingPractice() {
 									</p>
 								</div>
 							</div>
-							<button
-								type="button"
-								onClick={restart}
-								className="flex items-center gap-2 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700"
-							>
-								<RotateCcw size={14} />
-								Try Again
-							</button>
+							<div className="flex gap-3">
+								<button
+									type="button"
+									onClick={onNewPrompt}
+									className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+								>
+									<Wand2 size={14} />
+									New prompt
+								</button>
+								<button
+									type="button"
+									onClick={restart}
+									className="flex items-center gap-2 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700"
+								>
+									<RotateCcw size={14} />
+									Try Again
+								</button>
+							</div>
 						</div>
 					)}
 				</label>
