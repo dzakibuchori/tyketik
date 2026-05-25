@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnRoute = LearnRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/learn': typeof LearnRoute
+  '/library': typeof LibraryRoute
   '/test': typeof TestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/learn': typeof LearnRoute
+  '/library': typeof LibraryRoute
   '/test': typeof TestRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/learn': typeof LearnRoute
+  '/library': typeof LibraryRoute
   '/test': typeof TestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/learn' | '/test'
+  fullPaths: '/' | '/about' | '/learn' | '/library' | '/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/learn' | '/test'
-  id: '__root__' | '/' | '/about' | '/learn' | '/test'
+  to: '/' | '/about' | '/learn' | '/library' | '/test'
+  id: '__root__' | '/' | '/about' | '/learn' | '/library' | '/test'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   LearnRoute: typeof LearnRoute
+  LibraryRoute: typeof LibraryRoute
   TestRoute: typeof TestRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/test'
       fullPath: '/test'
       preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   LearnRoute: LearnRoute,
+  LibraryRoute: LibraryRoute,
   TestRoute: TestRoute,
 }
 export const routeTree = rootRouteImport

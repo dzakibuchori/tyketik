@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Loader2, SendHorizonal, Sparkles } from "lucide-react";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 
@@ -120,6 +121,15 @@ export function PromptInput({ onSubmit }: PromptInputProps) {
 							</button>
 						))}
 					</div>
+				</div>
+				{/* Library secondary CTA */}
+				<div className="mt-6 text-center">
+					<Link
+						to="/library"
+						className="text-xs text-gray-400 transition-colors hover:text-gray-600"
+					>
+						or browse our library of 100 curated passages →
+					</Link>
 				</div>
 			</div>
 		</section>

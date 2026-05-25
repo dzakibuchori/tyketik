@@ -1,43 +1,72 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PromptInput } from "#/components/PromptInput";
 import { TypingPractice } from "#/components/TypingPractice";
+import { getPassageById, PASSAGES } from "#/data/library";
+import { matchPromptToPassage } from "#/utils/matchPassage";
 
-// Hardcoded passage — swap this out when real AI is wired up
-const FALLBACK_STORY =
-	"A cat named Biscuit decided to become the world's greatest DJ. He spent three weeks learning to scratch records with his paws, only to discover he was shredding vinyl. His owner started selling the shredded pieces as abstract art on eBay for forty dollars each. Biscuit, furious about not getting royalties, launched his revenge: sitting directly on the keyboard whenever his owner worked. The laptop began autocorrecting everything to meow. The owner accidentally published a book titled Meow: A Business Strategy. It sold twelve thousand copies. Biscuit got nothing. He remains bitter to this day.";
-
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+	validateSearch: (
+		search: Record<string, unknown>,
+	): { passageId?: string } => ({
+		...(typeof search.passageId === "string"
+			? { passageId: search.passageId }
+			: {}),
+	}),
+	component: Home,
+});
 
 type View = "prompt" | "typing";
 
 function Home() {
+	const { passageId } = Route.useSearch();
+
 	const [view, setView] = useState<View>("prompt");
-	const [visible, setVisible] = useState(true); // drives opacity for fade
-	const [story, setStory] = useState(FALLBACK_STORY);
+	const [visible, setVisible] = useState(true);
+	const [story, setStory] = useState("");
 	const [activePrompt, setActivePrompt] = useState("");
+	const [fallbackPassageTitle, setFallbackPassageTitle] = useState<
+		string | undefined
+	>(undefined);
 	// Increments on every new session so TypingPractice remounts and resets cleanly
 	const [sessionKey, setSessionKey] = useState(0);
+
+	// If a passageId arrives from the library, jump straight to typing
+	useEffect(() => {
+		if (!passageId) return;
+		const passage = getPassageById(passageId);
+		if (!passage) return;
+		setStory(passage.text);
+		setActivePrompt(passage.title);
+		setFallbackPassageTitle(undefined);
+		setSessionKey((k) => k + 1);
+		setView("typing");
+	}, [passageId]);
 
 	// Fade-out → swap state → fade-in
 	function transitionTo(
 		nextView: View,
 		nextStory?: string,
 		nextPrompt?: string,
+		nextFallback?: string,
 	) {
 		setVisible(false);
 		setTimeout(() => {
 			if (nextStory) setStory(nextStory);
 			if (nextPrompt !== undefined) setActivePrompt(nextPrompt);
+			setFallbackPassageTitle(nextFallback);
 			if (nextView === "typing") setSessionKey((k) => k + 1);
 			setView(nextView);
 			setVisible(true);
-		}, 250); // matches the CSS transition duration below
+		}, 250);
 	}
 
 	function handlePromptSubmit(prompt: string) {
-		// TODO: replace FALLBACK_STORY with actual AI-generated text
-		transitionTo("typing", FALLBACK_STORY, prompt);
+		// TODO: call real AI here and pass the generated text as nextStory.
+		// On AI failure, fall through to matchPromptToPassage below.
+		const matched = matchPromptToPassage(prompt, PASSAGES);
+		// Remove fallback banner when AI is wired — it means the text was generated
+		transitionTo("typing", matched.text, prompt, matched.title);
 	}
 
 	function handleNewPrompt() {
@@ -57,6 +86,7 @@ function Home() {
 					story={story}
 					prompt={activePrompt}
 					onNewPrompt={handleNewPrompt}
+					fallbackPassageTitle={fallbackPassageTitle}
 				/>
 			)}
 		</div>

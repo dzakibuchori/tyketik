@@ -1,4 +1,4 @@
-import { RotateCcw, Wand2 } from "lucide-react";
+import { RotateCcw, Wand2, X, Zap } from "lucide-react";
 import {
 	type ChangeEvent,
 	useCallback,
@@ -19,18 +19,22 @@ interface TypingPracticeProps {
 	story: string;
 	prompt: string;
 	onNewPrompt: () => void;
+	/** When set, shows the amber AI-fallback banner with the matched passage title */
+	fallbackPassageTitle?: string;
 }
 
 export function TypingPractice({
 	story,
 	prompt,
 	onNewPrompt,
+	fallbackPassageTitle,
 }: TypingPracticeProps) {
 	const [typedText, setTypedText] = useState("");
 	const [startTime, setStartTime] = useState<number | null>(null);
 	const [endTime, setEndTime] = useState<number | null>(null);
 	const [now, setNow] = useState(() => performance.now());
 	const [isFocused, setIsFocused] = useState(false);
+	const [bannerVisible, setBannerVisible] = useState(true);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	// Keystroke counters — mutable refs so they never cause stale-closure issues
 	// in handleInput. Accuracy is derived from these on every render.
@@ -108,6 +112,13 @@ export function TypingPractice({
 		setTimeout(() => textareaRef.current?.focus(), 0);
 	}, []);
 
+	// Auto-dismiss the AI-fallback banner after 5 s
+	useEffect(() => {
+		if (!fallbackPassageTitle || !bannerVisible) return;
+		const timer = setTimeout(() => setBannerVisible(false), 5000);
+		return () => clearTimeout(timer);
+	}, [fallbackPassageTitle, bannerVisible]);
+
 	// Derived stats
 	const elapsedMins = elapsedMs / 60000;
 	const correctChars = [...typedText].filter((ch, i) => ch === story[i]).length;
@@ -146,6 +157,25 @@ export function TypingPractice({
 					</span>
 				</div>
 
+				{/* AI-fallback banner */}
+				{fallbackPassageTitle && bannerVisible && (
+					<div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+						<Zap size={15} className="mt-0.5 shrink-0 text-amber-500" />
+						<span className="flex-1">
+							AI is taking a moment — matched your prompt to:{" "}
+							<span className="font-semibold">"{fallbackPassageTitle}"</span>
+						</span>
+						<button
+							type="button"
+							onClick={() => setBannerVisible(false)}
+							aria-label="Dismiss"
+							className="shrink-0 rounded p-0.5 text-amber-500 hover:bg-amber-100"
+						>
+							<X size={14} />
+						</button>
+					</div>
+				)}
+
 				{/* Stats bar */}
 				<div className="mb-4 flex items-center justify-between px-1">
 					<div className="flex gap-6">
@@ -169,7 +199,7 @@ export function TypingPractice({
 							<div
 								className={[
 									"text-2xl font-bold tabular-nums",
-								remainingSecs <= 10 && startTime && !isComplete
+									remainingSecs <= 10 && startTime && !isComplete
 										? "text-red-500"
 										: "text-gray-800",
 								].join(" ")}
@@ -270,7 +300,9 @@ export function TypingPractice({
 					{!isFocused && !isComplete && (
 						<div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm">
 							<p className="text-sm font-medium text-gray-500">
-								{startTime ? "Click to continue typing" : "Click here to start typing"}
+								{startTime
+									? "Click to continue typing"
+									: "Click here to start typing"}
 							</p>
 						</div>
 					)}
@@ -330,7 +362,11 @@ export function TypingPractice({
 					<div
 						className={[
 							"h-full rounded-full transition-all duration-150",
-							isComplete ? "bg-green-500" : isLowTime ? "bg-red-500" : "bg-gray-800",
+							isComplete
+								? "bg-green-500"
+								: isLowTime
+									? "bg-red-500"
+									: "bg-gray-800",
 						].join(" ")}
 						style={{ width: `${isComplete ? 100 : timeProgress}%` }}
 					/>
