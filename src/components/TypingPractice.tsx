@@ -267,10 +267,10 @@ export function TypingPractice({
 
 					{/* Click-to-start overlay — z-10 sits above the transparent textarea.
 				    Clicks bubble to the <label>, which natively focuses #typing-input. */}
-					{!isFocused && !startTime && (
+					{!isFocused && !isComplete && (
 						<div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm">
 							<p className="text-sm font-medium text-gray-500">
-								Click here to start typing
+								{startTime ? "Click to continue typing" : "Click here to start typing"}
 							</p>
 						</div>
 					)}
