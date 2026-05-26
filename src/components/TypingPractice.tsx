@@ -1,4 +1,4 @@
-import { RotateCcw, Wand2, X, Zap } from "lucide-react";
+import { BookOpen, RotateCcw, Wand2, X, Zap } from "lucide-react";
 import {
 	type ChangeEvent,
 	useCallback,
@@ -148,13 +148,19 @@ export function TypingPractice({
 				</div>
 
 				{/* Prompt badge */}
-				<div className="mb-5 flex justify-center">
+				<div className="mb-5 flex flex-wrap justify-center gap-2">
 					<span className="inline-flex max-w-md items-center gap-1.5 truncate rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-500">
 						<Wand2 size={11} className="shrink-0 text-gray-400" />
 						<span className="truncate">
 							Topic: <span className="font-medium text-gray-700">{prompt}</span>
 						</span>
 					</span>
+					{fallbackPassageTitle && (
+						<span className="inline-flex max-w-xs items-center gap-1.5 truncate rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-700">
+							<BookOpen size={11} className="shrink-0 text-amber-500" />
+							<span className="truncate font-medium">{fallbackPassageTitle}</span>
+						</span>
+					)}
 				</div>
 
 				{/* AI-fallback banner */}
