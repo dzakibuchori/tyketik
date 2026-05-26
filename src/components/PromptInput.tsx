@@ -3,11 +3,31 @@ import { Loader2, SendHorizonal, Sparkles } from "lucide-react";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 
 const EXAMPLE_CHIPS = [
-	"A funny short story",
-	"A tech blog intro",
-	"A recipe for disaster",
-	"A space explorer's log",
-	"A detective's first clue",
+	{
+		label: "Why we do dumb things",
+		prompt:
+			"Something funny or fascinating about human psychology, why we make bad decisions, or how our brain fools us",
+	},
+	{
+		label: "When nature surprises you",
+		prompt:
+			"A surprising or mind-blowing story about animals, nature, ecosystems, or the natural world",
+	},
+	{
+		label: "Getting gloriously lost",
+		prompt:
+			"A vivid travel story about exploring a city, remote place, or unforgettable destination",
+	},
+	{
+		label: "A meal with a backstory",
+		prompt:
+			"A fascinating story about food, cooking, or how a beloved dish or culinary tradition came to be",
+	},
+	{
+		label: "Nobody saw that coming",
+		prompt:
+			"A surprising twist in history, sports, or business — an underdog moment or unexpected outcome nobody predicted",
+	},
 ];
 
 interface PromptInputProps {
@@ -40,9 +60,9 @@ export function PromptInput({ onSubmit }: PromptInputProps) {
 		if (e.key === "Enter") handleSubmit();
 	}
 
-	function fillChip(chip: string) {
+	function fillChip(prompt: string) {
 		if (isLoading) return;
-		setValue(chip);
+		setValue(prompt);
 		inputRef.current?.focus();
 	}
 
@@ -109,17 +129,17 @@ export function PromptInput({ onSubmit }: PromptInputProps) {
 						Try one of these
 					</p>
 					<div className="flex flex-wrap justify-center gap-2">
-						{EXAMPLE_CHIPS.map((chip) => (
-							<button
-								key={chip}
-								type="button"
-								onClick={() => fillChip(chip)}
-								disabled={isLoading}
-								className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40"
-							>
-								{chip}
-							</button>
-						))}
+					{EXAMPLE_CHIPS.map((chip) => (
+						<button
+							key={chip.label}
+							type="button"
+							onClick={() => fillChip(chip.prompt)}
+							disabled={isLoading}
+							className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40"
+						>
+							{chip.label}
+						</button>
+					))}
 					</div>
 				</div>
 				{/* Library secondary CTA */}
