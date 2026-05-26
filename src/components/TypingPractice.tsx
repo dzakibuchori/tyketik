@@ -158,7 +158,9 @@ export function TypingPractice({
 					{fallbackPassageTitle && (
 						<span className="inline-flex max-w-xs items-center gap-1.5 truncate rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-700">
 							<BookOpen size={11} className="shrink-0 text-amber-500" />
-							<span className="truncate font-medium">{fallbackPassageTitle}</span>
+							<span className="truncate font-medium">
+								{fallbackPassageTitle}
+							</span>
 						</span>
 					)}
 				</div>
