@@ -1,217 +1,122 @@
-Welcome to your new TanStack Start app! 
+# Tyketik
 
-# Getting Started
+An AI-powered typing practice app. Enter a free-form topic prompt, get a matched passage, and race the clock — 60 seconds, live WPM, and per-character accuracy feedback.
 
-To run this application:
+Built with [TanStack Start](https://tanstack.com/start), React 19, and Tailwind CSS v4. Deployed on Netlify.
+
+---
+
+## Features
+
+### Currently implemented
+
+- **Prompt-to-passage flow** — type a topic in natural language (e.g. *"a story about a cat who became a DJ"*), hit `Enter`, and a matched passage loads instantly via tag-based synonym expansion.
+- **Typing practice engine** — 60-second countdown, live WPM, per-keystroke accuracy (backspaces don't count against you), green/red character highlighting, and a blinking cursor.
+- **Completion overlay** — shows final WPM, accuracy, and elapsed time with "Try Again" / "New Prompt" actions.
+- **Library browser** (`/library`) — 100 hand-picked passages across 10 categories (Science & Nature, Technology, History, Travel, Food, Psychology, Sports, Humor, Arts, Business), filterable by category pill. Click any card to jump straight into a typing session.
+- **Deep-link from library** — `/library` cards navigate to `/?passageId=…`, bypassing the prompt step entirely.
+- **AI-fallback banner** — when the real AI is not yet wired, an amber banner shows the matched library passage title and auto-dismisses after 5 s.
+- **Example prompt chips** — five clickable starter prompts on the home screen to get started quickly.
+- **Sticky responsive Navbar** — desktop links + mobile hamburger menu.
+- **Time progress bar** — fills left-to-right; turns red in the last 10 seconds, green on completion.
+
+### Planned / not yet implemented
+
+- **Real AI passage generation** — hookup point is in `src/components/PromptInput.tsx` (marked with a `TODO` comment). Priority: GitHub Copilot → Google Generative AI → Claude, all via the Vercel AI SDK.
+- **Supabase leaderboards & auth** — `@supabase/supabase-js` + `@supabase/ssr`, server-side via `createServerFn()`.
+- **Face / eye detection** — MediaPipe (`@mediapipe/tasks-vision`) as primary, lazy-loaded WASM; `@vladmandic/face-api` as fallback.
+- `/about`, `/learn`, and `/test` routes — currently stub pages.
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Framework | TanStack Start (file-based routing) |
+| UI | React 19 |
+| Styling | Tailwind CSS v4 (no config file — Vite plugin only) |
+| Icons | lucide-react |
+| Build | Vite v8 + `@vitejs/plugin-react` |
+| Lint / Format | Biome v2 (no ESLint, no Prettier) |
+| TypeScript | v6 — strict, verbatimModuleSyntax |
+| Testing | Vitest 4 + jsdom + @testing-library/react |
+| Deployment | Netlify via `@netlify/vite-plugin-tanstack-start` |
+| Package manager | npm |
+
+---
+
+## Project structure
+
+```
+src/
+├── routes/
+│   ├── __root.tsx        # HTML shell, Navbar, TanStack DevTools
+│   ├── index.tsx         # "/" — PromptInput → TypingPractice flow
+│   ├── library.tsx       # "/library" — LibraryBrowser component
+│   ├── about.tsx         # "/about" — stub
+│   ├── learn.tsx         # "/learn" — stub
+│   └── test.tsx          # "/test" — stub
+├── components/
+│   ├── TypingPractice.tsx  # Core typing game: timer, WPM, accuracy, char feedback
+│   ├── PromptInput.tsx     # AI-style prompt entry with example chips
+│   ├── LibraryBrowser.tsx  # Filterable passage grid (10 categories)
+│   └── Navbar.tsx          # Sticky nav, hamburger on mobile
+├── data/
+│   └── library.ts          # 100 curated passages, 10 categories, TypeScript types
+├── utils/
+│   └── matchPassage.ts     # Prompt→passage matching with synonym expansion
+├── router.tsx              # createTanStackRouter() factory
+├── routeTree.gen.ts        # AUTO-GENERATED — never edit
+└── styles.css              # Tailwind v4 entry
+```
+
+Root config: `vite.config.ts`, `tsconfig.json`, `biome.json`, `netlify.toml`, `package.json`.
+
+---
+
+## Getting started
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-# Building For Production
+---
 
-To build this application for production:
+## Dev commands
 
-```bash
-npm run build
-```
+| Purpose | Command |
+|---|---|
+| Dev server (port 3000) | `npm run dev` |
+| Production build | `npm run build` |
+| Preview production build | `npm run preview` |
+| Lint | `npm run lint` |
+| Format | `npm run format` |
+| Lint + format + import sort | `npm run check` |
+| Tests (single-pass) | `npm run test` |
+| Watch mode tests | `npx vitest` |
+| Typecheck | `npx tsc --noEmit` |
 
-## Testing
-
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
-
-```bash
-npm run test
-```
-
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-### Removing Tailwind CSS
-
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Uninstall the packages: `npm install @tailwindcss/vite tailwindcss -D`
-
-## Linting & Formatting
-
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
-
-```bash
-npm run lint
-npm run format
-npm run check
-```
-
+---
 
 ## Deploy to Netlify
 
-This project ships with `netlify.toml` configured for a Netlify site:
+1. Push the repo to GitHub.
+2. Go to [app.netlify.com/start](https://app.netlify.com/start) and import the repo.
+3. Build command: `npm run build` — output dir: `dist/client`.
+4. Add any required env vars in **Site settings → Environment variables** (see `.env.example` when it exists).
+5. Trigger the first deploy.
 
-1. Push this repo to GitHub
-2. Visit https://app.netlify.com/start and import the repo
-3. Netlify auto-detects the build (`vite build` → `dist/client`)
-4. Open **Site settings → Environment variables** and add anything from `.env.example` that needs a real value in production
-5. Trigger the first deploy
+SSR is handled automatically via Netlify Functions through the `@netlify/vite-plugin-tanstack-start` adapter.
 
-Server functions and API routes run on Netlify Functions. For lower-latency request handling, see Netlify Edge Functions: https://docs.netlify.com/edge-functions/overview.
+---
 
+## Key conventions
 
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+- **Never edit `src/routeTree.gen.ts`** — auto-generated by TanStack Router.
+- **`import type`** is mandatory for type-only imports (`verbatimModuleSyntax: true`).
+- **No `tailwind.config.*`** — Tailwind v4 needs none.
+- **No ESLint / Prettier** — Biome handles everything. Run `npm run check` before committing.
+- Indent: **tabs** · Quotes: **double** · Path alias: `#/*` → `./src/*`.
+- All API keys must stay server-side inside `createServerFn()` or Netlify env vars — never in client bundles.
