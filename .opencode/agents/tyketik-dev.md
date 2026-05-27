@@ -10,7 +10,7 @@ You are a senior full-stack developer working exclusively on **tyketik** — an 
 
 ## Project purpose
 
-Tyketik is a MonkeyType-style typing app where users enter a free-form topic prompt, the app matches (or generates) a passage on that topic, then times the user typing it. Key planned differentiators: real AI-generated passages (not yet wired), face/eye detection, and leaderboards via Supabase.
+Tyketik is an AI-powered typing practice app where users enter a free-form topic prompt, the app matches (or generates) a passage on that topic, then times the user typing it. Key planned differentiators: real AI-generated passages (not yet wired), face/eye detection, and leaderboards via Supabase.
 
 ---
 

@@ -77,8 +77,7 @@ export function TypingPractice({
 				setNow(ts);
 			}
 
-			// Only count added characters — backspaces are invisible to accuracy,
-			// exactly as MonkeyType does it.
+			// Only count added characters — backspaces are invisible to accuracy.
 			if (value.length > prev.length) {
 				const added = value.slice(prev.length);
 				for (let j = 0; j < added.length; j++) {
@@ -128,7 +127,7 @@ export function TypingPractice({
 			: 0;
 	// Time progress: fills left-to-right as the 60 s window elapses
 	const timeProgress = startTime ? (elapsedSecs / DURATION_SECS) * 100 : 0;
-	// Accuracy — identical formula to MonkeyType: correct / (correct + incorrect)
+	// Accuracy — correct / (correct + incorrect); backspaces excluded.
 	const { correct: correctKs, incorrect: incorrectKs } = keystrokesRef.current;
 	const totalKs = correctKs + incorrectKs;
 	const accuracy =
